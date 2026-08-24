@@ -187,6 +187,11 @@
         <div class="char-name">Валера</div>
         <div class="char-desc">Не боится темноты. Хорошо ориентируется в незнакомых помещениях.</div>
       </div>
+      <div class="char-card" data-char="evelina" onclick="App.pickCharacter('evelina')">
+        <div class="char-portrait"><svg viewBox="0 0 100 120" width="90" height="108"><ellipse cx="50" cy="31" rx="18" ry="21" fill="#d2ad91"/><path d="M19 112 Q19 59 50 59 Q81 59 81 112 Z" fill="#32465c"/><path d="M27 19 Q50 2 73 19 Q78 39 69 51 Q65 29 50 27 Q35 29 31 51 Q22 39 27 19 Z" fill="#4a2d24"/></svg></div>
+        <div class="char-name">Эвелина</div>
+        <div class="char-desc">Доверяет интуиции. Замечает закономерности там, где другие видят случайность.</div>
+      </div>
     </div>
     <div class="btnrow">
       <button id="charContinueBtn" class="primary" disabled onclick="App.goTo('roomScreen')">Далее</button>
@@ -299,7 +304,8 @@ async function sSet(key, value){
 
 const CHAR_DEFS = {
   kristina: { name:'Кристина', bodyColor:0x6b2b3a, headColor:0xc9a98a, hairColor:0x2a1f1c },
-  valera:   { name:'Валера',   bodyColor:0x3a4a3a, headColor:0xb8926f, hairColor:0x1f1a16 }
+  valera:   { name:'Валера',   bodyColor:0x3a4a3a, headColor:0xb8926f, hairColor:0x1f1a16 },
+  evelina:  { name:'Эвелина',  bodyColor:0x32465c, headColor:0xd2ad91, hairColor:0x4a2d24 }
 };
 
 const App = {
@@ -517,6 +523,7 @@ const Game = {
   puzzle2Solved:false,
   player:{x:0,y:1.6,z:0,ry:0},
   otherMesh:null,
+  otherCharacter:null,
   otherTarget:{x:0,y:1.6,z:0,ry:0},
   interactables:[],
   keys:{},
@@ -622,8 +629,9 @@ const Game = {
     else if(stage==='shared') this.buildShared();
 
     // other player avatar
-    const cdef = CHAR_DEFS[this.app.character==='kristina'?'valera':'kristina'];
-    this.otherMesh = this.makeAvatar(cdef);
+    const fallbackCharacter = this.app.character==='kristina' ? 'valera' : 'kristina';
+    this.otherCharacter = fallbackCharacter;
+    this.otherMesh = this.makeAvatar(CHAR_DEFS[fallbackCharacter]);
     this.otherMesh.visible = false;
     this.scene.add(this.otherMesh);
 
@@ -790,6 +798,16 @@ const Game = {
 
   updateOther(d){
     this.otherTarget = d;
+    if(d.character && CHAR_DEFS[d.character] && d.character !== this.otherCharacter){
+      const wasVisible = this.otherMesh ? this.otherMesh.visible : false;
+      if(this.otherMesh) this.scene.remove(this.otherMesh);
+      this.otherCharacter = d.character;
+      this.otherMesh = this.makeAvatar(CHAR_DEFS[d.character]);
+      this.otherMesh.position.set(d.x || 0, 0, d.z || 0);
+      this.otherMesh.rotation.y = d.ry || 0;
+      this.otherMesh.visible = wasVisible;
+      this.scene.add(this.otherMesh);
+    }
     if(this.otherMesh){
       this.otherMesh.visible = (d.stage === this.stage);
     }
