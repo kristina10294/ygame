@@ -1,0 +1,16 @@
+{
+  "name": "vyhod-game",
+  "version": "1.0.0",
+  "description": "ВЫХОД. Найди его вдвоём. — кооперативная 3D escape-room для двоих",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
